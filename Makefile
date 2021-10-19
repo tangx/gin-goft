@@ -1,6 +1,6 @@
 
 up:
-	cd cmd/goft/ && go run .
+	cd cmd/demo/ && go run .
 tidy:
 	go mod tidy
 

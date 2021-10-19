@@ -24,7 +24,7 @@ func NewWithEngine(e *gin.Engine) *Goft {
 
 // Mount 挂载控制器
 // 03.1. 关联控制器与 goft
-// 03.2. 返回 *Goft 是为了方便链式调用
+// 03.2. 返回 *GoftGroup 是为了方便链式调用
 func (goft *Goft) Mount(group string, classes ...ClassController) *GoftGroup {
 
 	// 04.1. 注册路由组
