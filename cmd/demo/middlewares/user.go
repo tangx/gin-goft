@@ -15,7 +15,10 @@ func NewUser() *User {
 	return &User{}
 }
 
-func (user *User) OnRequest(c *gin.Context) (err error) {
+// OnRequest 实现 Fairing 接口
+// 这里是否应该使用 指针方法 呢？
+//    即 `func (user User) OnRequest(c *gin.Context)`
+func (user User) OnRequest(c *gin.Context) (err error) {
 
 	user.Name = c.Query("name")
 	if user.Name != "zhangsan" {

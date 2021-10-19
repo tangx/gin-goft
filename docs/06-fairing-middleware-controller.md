@@ -67,7 +67,7 @@ type User struct {
 	Name string `query:"name"`
 }
 
-func (user *User) OnRequest(c *gin.Context) (err error) {
+func (user User) OnRequest(c *gin.Context) (err error) {
 
 	user.Name = c.Query("name")
 	if user.Name != "zhangsan" {
@@ -117,3 +117,24 @@ func main() {
 }
 ```
 
+## 遗留问题
+
+两种方法都能实现功能。
+
+但是中间件控制器使用 **指针方法** 是否会在高并发的时候出现数据紊乱？
+
+```go
+// 值方法
+func (user User) OnRequest(c *gin.Context) (err error) {
+	user.Name = c.Query("name")
+	// ...省略
+	return
+}
+
+// 指针方法
+func (user *User) OnRequest(c *gin.Context) (err error) {
+	user.Name = c.Query("name")
+	// ...省略
+	return
+}
+```
