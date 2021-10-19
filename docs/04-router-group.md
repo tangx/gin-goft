@@ -75,3 +75,7 @@ func (goft *Goft) Handle(httpMethod, relativePath string, handlers ...gin.Handle
 [GIN-debug] GET    /v2/                      --> github.com/tangx-labs/gin-goft/classes.handlerIndex (3 handlers)
 [GIN-debug] Listening and serving HTTP on :8089
 ```
+
+## 遗留问题
+
+在 gin 中， RouterGroup 是可以一级一级往下扩展的。 但是在当前 goft 中所有的路由组都是挂载到 `gin.Engine` 上的， 所以就丢失了这个功能。
