@@ -42,12 +42,6 @@ func (goft *Goft) BasePath(group string) *Goft {
 	return goft
 }
 
-// Handle 重载 gin.Engine 的 Handle 方法。
-// 04.2. 这样子路由注册的时候， 就直接挂载到了 RouterGroup 上， 有了层级关系
-// func (goft *Goft) Handle(httpMethod, relativePath string, handlers ...gin.HandlerFunc) {
-// 	goft.rg.Handle(httpMethod, relativePath, handlers...)
-// }
-
 // Launch 启动 gin-goft server。
 // 这里由于重载问题， 不能将启动方法命名为 Run
 func (goft *Goft) Launch() error {

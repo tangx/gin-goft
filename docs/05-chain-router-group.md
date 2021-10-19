@@ -144,6 +144,12 @@ cd cmd/demo/ && go run .
 [GIN-debug] Listening and serving HTTP on :8089
 ```
 
+
+### 删除重载的 Handle 方法
+
+由于 Mount 下沉到 GoftGroup 中实现之后， goft 本身也没有必再重载 `Handle` 方法了， 因此这部分代码将被删除。
+
+
 ## 目录结构调整
 
 1. 对 project 的名字进行了修改， 由 `goft` 改成 `demo` 。 
