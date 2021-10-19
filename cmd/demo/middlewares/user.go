@@ -11,6 +11,10 @@ type User struct {
 	Name string `query:"name"`
 }
 
+func NewUser() *User {
+	return &User{}
+}
+
 func (user *User) OnRequest(c *gin.Context) (err error) {
 
 	user.Name = c.Query("name")

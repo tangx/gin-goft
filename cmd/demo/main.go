@@ -21,7 +21,7 @@ func main() {
 	{
 		v2Router := g.Mount("/v2")
 		// 子路由注册中间件
-		v2Router.Attach(&middlewares.User{})
+		v2Router.Attach(middlewares.NewUser())
 
 		v2Router.Mount("/v3", classes.NewIndex())
 
