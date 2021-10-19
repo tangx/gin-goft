@@ -4,6 +4,7 @@ import "github.com/gin-gonic/gin"
 
 type Goft struct {
 	*gin.Engine
+	rg *gin.RouterGroup
 }
 
 // Default 创建一个默认的 Engine
@@ -21,16 +22,25 @@ func NewWithEngine(e *gin.Engine) *Goft {
 }
 
 // Mount 挂载控制器
-// 1. 关联控制器与 goft
-// 2. 返回 *Goft 是为了方便链式调用
-func (goft *Goft) Mount(classes ...ClassController) *Goft {
-	for _, class := range classes {
+// 03.1. 关联控制器与 goft
+// 03.2. 返回 *Goft 是为了方便链式调用
+func (goft *Goft) Mount(group string, classes ...ClassController) *Goft {
 
-		// 将 goft 传入到控制器中
+	// 04.1. 注册路由组
+	goft.rg = goft.Group(group)
+
+	for _, class := range classes {
+		// 03.3. 将 goft 传入到控制器中
 		class.Build(goft)
 	}
 
 	return goft
+}
+
+// Handle 重载 gin 的 Handle 方法。
+// 04.2. 这样子路由注册的时候， 就直接挂载到了 RouterGroup 上， 有了层级关系
+func (goft *Goft) Handle(httpMethod, relativePath string, handlers ...gin.HandlerFunc) {
+	goft.rg.Handle(httpMethod, relativePath, handlers...)
 }
 
 // Launch 启动 gin-goft server。

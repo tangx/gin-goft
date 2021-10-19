@@ -11,7 +11,11 @@ func main() {
 	g := goft.Default()
 
 	// 2. 注册路由
-	g.Mount(
+	g.Mount("/v1",
+		classes.NewIndex(),
+	)
+	// 04.2. 注册多个路由组。
+	g.Mount("/v2",
 		classes.NewIndex(),
 	)
 
