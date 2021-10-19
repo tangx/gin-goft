@@ -1,7 +1,10 @@
 package goft
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	"github.com/tangx/ginbinder"
 )
 
 type GoftGroup struct {
@@ -23,11 +26,11 @@ func newGoftGroup(base *GoftGroup, group string) *GoftGroup {
 }
 
 // Mount 在 GoftGroup 上绑定/注册 控制器
-func (gg *GoftGroup) Mount(group string, claess ...ClassController) *GoftGroup {
+func (gg *GoftGroup) Mount(group string, classes ...ClassController) *GoftGroup {
 	grp := newGoftGroup(gg, group)
 
-	for _, class := range claess {
-		class.Build(grp)
+	for _, class := range classes {
+		grp.Handle(class)
 	}
 
 	return grp
@@ -36,4 +39,28 @@ func (gg *GoftGroup) Mount(group string, claess ...ClassController) *GoftGroup {
 // Attach 绑定/注册 中间件
 func (gg *GoftGroup) Attach(fairs ...Fairing) {
 	attachFairings(gg, fairs...)
+}
+
+func (gg *GoftGroup) Handle(class ClassController) {
+
+	m := class.Method()
+	p := class.Path()
+	handler := class.Handler
+
+	gg.RouterGroup.Handle(m, p, func(c *gin.Context) {
+		err := ginbinder.ShouldBindRequest(c, class)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, err.Error())
+			return
+		}
+
+		v, err := handler()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		c.JSON(http.StatusOK, v)
+	})
+
 }

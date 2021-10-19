@@ -49,5 +49,12 @@ func (goft *Goft) BasePath(group string) *Goft {
 }
 
 func (goft *Goft) Attach(fairs ...Fairing) {
-	attachFairings(goft, fairs...)
+	for _, fair := range fairs {
+		handler := func(c *gin.Context) {
+			_ = fair.OnRequest(c)
+			c.Next()
+		}
+
+		goft.Use(handler)
+	}
 }

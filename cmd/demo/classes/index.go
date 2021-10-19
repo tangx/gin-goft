@@ -1,28 +1,30 @@
 package classes
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/tangx-labs/gin-goft/goft"
+	"fmt"
+
+	"github.com/tangx-labs/gin-goft/httpx"
 )
 
 // Index
-// 删除 e *gin.Engine ， 删除强耦合关系
 type Index struct {
+	httpx.MethodGet
+	Name string `query:"name"`
 }
 
 func NewIndex() *Index {
 	return &Index{}
 }
 
-// Build 控制器的构造器， 创建路由信息
-// 1. 通过传参 解耦控制器和 gin server 的关系
-// 2. 通过实现 ClassController 接口关联与 goft
-func (index *Index) Build(goft *goft.GoftGroup) {
-	goft.Handle("GET", "/index", handlerIndex)
+func (index *Index) Path() string {
+	return "/index"
 }
 
-func handlerIndex(c *gin.Context) {
-	c.JSON(200, map[string]string{
-		"hello": "gin-goft",
-	})
+// wanted
+func (index *Index) Handler() (interface{}, error) {
+	if index.Name != "wangwu" {
+		return nil, fmt.Errorf("invalid user: %s", index.Name)
+	}
+
+	return "hello, gin-goft", nil
 }

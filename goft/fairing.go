@@ -11,7 +11,7 @@ type Fairing interface {
 	OnRequest(c *gin.Context) error
 }
 
-func attachFairings(iroute gin.IRoutes, fairs ...Fairing) {
+func attachFairings(gg *GoftGroup, fairs ...Fairing) {
 	for _, fair := range fairs {
 		fair := fair
 
@@ -38,6 +38,6 @@ func attachFairings(iroute gin.IRoutes, fairs ...Fairing) {
 		}
 
 		// 使用 中间件
-		iroute.Use(handler)
+		gg.Use(handler)
 	}
 }
