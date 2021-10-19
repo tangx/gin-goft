@@ -37,7 +37,7 @@ func (goft *Goft) Mount(group string, classes ...ClassController) *Goft {
 	return goft
 }
 
-// Handle 重载 gin 的 Handle 方法。
+// Handle 重载 gin.Engine 的 Handle 方法。
 // 04.2. 这样子路由注册的时候， 就直接挂载到了 RouterGroup 上， 有了层级关系
 func (goft *Goft) Handle(httpMethod, relativePath string, handlers ...gin.HandlerFunc) {
 	goft.rg.Handle(httpMethod, relativePath, handlers...)
