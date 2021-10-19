@@ -50,3 +50,28 @@ func (goft *Goft) Handle(httpMethod, relativePath string, handlers ...gin.Handle
 ```
 
 重载 Handle 方法之后， 控制器的子路由就被路由组分组了。
+
+
+## 挂载路由组
+
+在 [main.go](/cmd/goft/main.go) 中， 为 Mount 方法增加路由组 `v1`， 并添加了一个新的路由组 `v2`
+
+```go
+	// 2. 注册路由
+	g.Mount("/v1",
+		classes.NewIndex(),
+	)
+	// 04.2. 注册多个路由组。
+	g.Mount("/v2",
+		classes.NewIndex(),
+	)
+```
+
+启动服务后，可以看到两组路由， v1 和 v2
+
+```bash
+# cd cmd/goft/ && go run .
+[GIN-debug] GET    /v1/                      --> github.com/tangx-labs/gin-goft/classes.handlerIndex (3 handlers)
+[GIN-debug] GET    /v2/                      --> github.com/tangx-labs/gin-goft/classes.handlerIndex (3 handlers)
+[GIN-debug] Listening and serving HTTP on :8089
+```
