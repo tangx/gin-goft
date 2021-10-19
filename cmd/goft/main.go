@@ -1,17 +1,20 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/tangx-labs/gin-goft/classes"
+	"github.com/tangx-labs/gin-goft/goft"
 )
 
 func main() {
-	r := gin.Default()
 
-	// 3. 向 gin engine 注册路由信息
-	classes.NewIndex(r).Build()
+	// 1. 使用 goft 代替 gin
+	g := goft.Default()
 
-	if err := r.Run(":8089"); err != nil {
-		panic(err)
-	}
+	// 2. 注册路由
+	g.Mount(
+		classes.NewIndex(),
+	)
+
+	// 3. 启动 goft server
+	g.Launch()
 }

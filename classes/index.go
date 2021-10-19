@@ -1,23 +1,24 @@
 package classes
 
-import "github.com/gin-gonic/gin"
-
-// 1. 创建一个 Index 业务控制器， 被在其中内嵌一个 gin engine
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/tangx-labs/gin-goft/goft"
+)
 
 // Index
+// 删除 e *gin.Engine ， 删除强耦合关系
 type Index struct {
-	e *gin.Engine
 }
 
-func NewIndex(e *gin.Engine) *Index {
-	return &Index{
-		e: e,
-	}
+func NewIndex() *Index {
+	return &Index{}
 }
 
-// Build 2. 构造器， 创建路由信息
-func (index *Index) Build() {
-	index.e.Handle("GET", "/", handlerIndex)
+// Build 控制器的构造器， 创建路由信息
+// 1. 通过传参 解耦控制器和 gin server 的关系
+// 2. 通过实现 ClassController 接口关联与 goft
+func (index *Index) Build(goft *goft.Goft) {
+	goft.Handle("GET", "/", handlerIndex)
 }
 
 func handlerIndex(c *gin.Context) {
