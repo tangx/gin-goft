@@ -4,44 +4,49 @@ import "github.com/gin-gonic/gin"
 
 type Goft struct {
 	*gin.Engine
-	rg *gin.RouterGroup
+	gg *GoftGroup
 }
 
 // Default 创建一个默认的 Engine
 func Default() *Goft {
-	return &Goft{
-		Engine: gin.Default(),
-	}
+	r := gin.Default()
+	return NewWithEngine(r)
 }
 
 // NewWithEngine 使用自定义 gin engine 创建
 func NewWithEngine(e *gin.Engine) *Goft {
-	return &Goft{
+	goft := &Goft{
 		Engine: e,
 	}
+
+	return goft
 }
 
 // Mount 挂载控制器
 // 03.1. 关联控制器与 goft
 // 03.2. 返回 *Goft 是为了方便链式调用
-func (goft *Goft) Mount(group string, classes ...ClassController) *Goft {
+func (goft *Goft) Mount(group string, classes ...ClassController) *GoftGroup {
 
 	// 04.1. 注册路由组
-	goft.rg = goft.Group(group)
-
-	for _, class := range classes {
-		// 03.3. 将 goft 传入到控制器中
-		class.Build(goft)
+	if goft.gg == nil {
+		goft.gg = baseGoftGroup(goft, "/")
 	}
+
+	return goft.gg.Mount(group, classes...)
+}
+
+// BasePath 设置 Goft 的根路由
+func (goft *Goft) BasePath(group string) *Goft {
+	goft.gg = baseGoftGroup(goft, group)
 
 	return goft
 }
 
 // Handle 重载 gin.Engine 的 Handle 方法。
 // 04.2. 这样子路由注册的时候， 就直接挂载到了 RouterGroup 上， 有了层级关系
-func (goft *Goft) Handle(httpMethod, relativePath string, handlers ...gin.HandlerFunc) {
-	goft.rg.Handle(httpMethod, relativePath, handlers...)
-}
+// func (goft *Goft) Handle(httpMethod, relativePath string, handlers ...gin.HandlerFunc) {
+// 	goft.rg.Handle(httpMethod, relativePath, handlers...)
+// }
 
 // Launch 启动 gin-goft server。
 // 这里由于重载问题， 不能将启动方法命名为 Run

@@ -1,5 +1,5 @@
 package goft
 
 type ClassController interface {
-	Build(goft *Goft)
+	Build(goft *GoftGroup)
 }
