@@ -1,6 +1,8 @@
 package goft
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 type GoftGroup struct {
 	*gin.RouterGroup
@@ -29,4 +31,9 @@ func (gg *GoftGroup) Mount(group string, claess ...ClassController) *GoftGroup {
 	}
 
 	return grp
+}
+
+// Attach 绑定/注册 中间件
+func (gg *GoftGroup) Attach(fairs ...Fairing) {
+	attachFairings(gg, fairs...)
 }

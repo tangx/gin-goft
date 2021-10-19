@@ -1,0 +1,22 @@
+package middlewares
+
+import (
+	"fmt"
+
+	"github.com/gin-gonic/gin"
+)
+
+type User struct {
+	Name string `query:"name"`
+}
+
+func (user *User) OnRequest(c *gin.Context) (err error) {
+
+	user.Name = c.Query("name")
+	if user.Name != "zhangsan" {
+		err = fmt.Errorf("非法用户: %s", user.Name)
+		return
+	}
+
+	return
+}

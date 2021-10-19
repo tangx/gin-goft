@@ -1,0 +1,7 @@
+
+### GET
+GET http://127.0.0.1:8089/demo/v2/v3/index?name=wangwu
+
+
+### GET v1
+GET http://127.0.0.1:8089/demo/v1/index?name=wangwu

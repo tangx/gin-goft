@@ -1,6 +1,8 @@
 package goft
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 type Goft struct {
 	*gin.Engine
@@ -22,16 +24,20 @@ func NewWithEngine(e *gin.Engine) *Goft {
 	return goft
 }
 
+// Launch 启动 gin-goft server。
+// 这里由于重载问题， 不能将启动方法命名为 Run
+func (goft *Goft) Launch() error {
+	return goft.Run(":8089")
+}
+
 // Mount 挂载控制器
 // 03.1. 关联控制器与 goft
 // 03.2. 返回 *GoftGroup 是为了方便链式调用
 func (goft *Goft) Mount(group string, classes ...ClassController) *GoftGroup {
-
 	// 04.1. 注册路由组
 	if goft.gg == nil {
 		goft.gg = baseGoftGroup(goft, "/")
 	}
-
 	return goft.gg.Mount(group, classes...)
 }
 
@@ -42,8 +48,6 @@ func (goft *Goft) BasePath(group string) *Goft {
 	return goft
 }
 
-// Launch 启动 gin-goft server。
-// 这里由于重载问题， 不能将启动方法命名为 Run
-func (goft *Goft) Launch() error {
-	return goft.Run(":8089")
+func (goft *Goft) Attach(fairs ...Fairing) {
+	attachFairings(goft, fairs...)
 }
