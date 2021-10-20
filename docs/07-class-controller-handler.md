@@ -138,3 +138,49 @@ type ClassController interface {
 }
 ```
 
+## GoftGroup.Handle 重载引起的 Fairing 控制器行为不兼容
+
+之前在实现 Fairing 控制器的时候，为了方便 `Goft` 和 `GoftGroup` 加载中间件的行为，使用了 `gin.IRoutes` 进行参数约束。
+
+```go
+func attachFairings(iroute gin.IRoutes, fairs ...Fairing) {
+	for _, fair := range fairs {
+		fair := fair
+		// 创建一个临时中间件 handler
+		handler := func(c *gin.Context) {
+			_ = fair.OnRequest(c)
+			c.Next()
+		}
+		// 使用 中间件
+		iroute.Use(handler)
+	}
+}
+```
+
+但是在重载 `GoftGroup` 的 Handle 方法之后签名发生了改变, 由 `Handle(string, string, ...HandlerFunc) IRoutes` 变成了 `Handle(class ClassController)`。 因此引发了不兼容的情况。
+
+```go
+type Goft struct {
+	*gin.Engine
+	rootGrp *GoftGroup
+}
+```
+
+因此最 Attach 也做了响应的改造。 将 Fairing 的接收者直接设置为了 GoftGroup 。
+
+```go
+func (gg *GoftGroup) attach(fairs ...Fairing) {
+	for _, fair := range fairs {
+		fair := fair
+
+		// 创建一个临时中间件 handler
+		handler := func(c *gin.Context) {
+			_ = fair.OnRequest(c)
+			c.Next()
+		}
+
+		// 使用 中间件
+		gg.Use(handler)
+	}
+}
+```

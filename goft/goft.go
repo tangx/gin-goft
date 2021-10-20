@@ -6,7 +6,7 @@ import (
 
 type Goft struct {
 	*gin.Engine
-	gg *GoftGroup
+	rootGrp *GoftGroup
 }
 
 // Default 创建一个默认的 Engine
@@ -21,7 +21,16 @@ func NewWithEngine(e *gin.Engine) *Goft {
 		Engine: e,
 	}
 
+	goft.initial()
+
 	return goft
+}
+
+// initial 初始化 Goft
+func (goft *Goft) initial() {
+	if goft.rootGrp == nil {
+		goft.rootGrp = baseGoftGroup(goft, "/")
+	}
 }
 
 // Launch 启动 gin-goft server。
@@ -35,26 +44,16 @@ func (goft *Goft) Launch() error {
 // 03.2. 返回 *GoftGroup 是为了方便链式调用
 func (goft *Goft) Mount(group string, classes ...ClassController) *GoftGroup {
 	// 04.1. 注册路由组
-	if goft.gg == nil {
-		goft.gg = baseGoftGroup(goft, "/")
-	}
-	return goft.gg.Mount(group, classes...)
+	return goft.rootGrp.Mount(group, classes...)
 }
 
 // BasePath 设置 Goft 的根路由
 func (goft *Goft) BasePath(group string) *Goft {
-	goft.gg = baseGoftGroup(goft, group)
+	goft.rootGrp = baseGoftGroup(goft, group)
 
 	return goft
 }
 
 func (goft *Goft) Attach(fairs ...Fairing) {
-	for _, fair := range fairs {
-		handler := func(c *gin.Context) {
-			_ = fair.OnRequest(c)
-			c.Next()
-		}
-
-		goft.Use(handler)
-	}
+	goft.rootGrp.Attach(fairs...)
 }
