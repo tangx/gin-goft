@@ -1,4 +1,4 @@
-package goft
+package adaptors
 
 import (
 	"gorm.io/driver/mysql"

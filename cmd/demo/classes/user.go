@@ -1,8 +1,8 @@
 package classes
 
 import (
+	"github.com/tangx-labs/gin-goft/cmd/demo/adaptors"
 	"github.com/tangx-labs/gin-goft/cmd/demo/models"
-	"github.com/tangx-labs/gin-goft/goft"
 	"github.com/tangx-labs/gin-goft/httpx"
 )
 
@@ -10,7 +10,7 @@ type GetUserByID struct {
 	httpx.MethodGet
 	UserID string `uri:"id"`
 
-	DBA *goft.GormAdaptor
+	DBA *adaptors.GormAdaptor
 }
 
 func (user *GetUserByID) Path() string {

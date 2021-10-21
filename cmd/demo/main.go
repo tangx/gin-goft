@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/tangx-labs/gin-goft/cmd/demo/adaptors"
 	"github.com/tangx-labs/gin-goft/cmd/demo/classes"
 	"github.com/tangx-labs/gin-goft/goft"
 )
@@ -10,6 +11,9 @@ func main() {
 	// 1. 使用 goft 代替 gin
 	g := goft.Default()
 	// g.Attach(&middlewares.User{})
+	g.WithAdaptors(
+		adaptors.NewGormAdaptor(),
+	)
 
 	demo := g.Mount("/demo")
 

@@ -64,3 +64,8 @@ func (goft *Goft) DB(dba interface{}) *Goft {
 	goft.dba = dba
 	return goft
 }
+
+// WithAdaptors 注入适配器， 比如 *gorm.DB, *goredis.Redis
+func (goft *Goft) WithAdaptors(adaptors ...interface{}) {
+	goft.rootGrp.WithAdaptors(adaptors...)
+}

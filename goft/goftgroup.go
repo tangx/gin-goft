@@ -15,18 +15,22 @@ type IGoftRouter interface {
 type IGoftRoutes interface {
 	Bind(ClassController) IGoftRoutes
 	Attach(...Fairing) IGoftRoutes
+	WithAdaptors(adaptors ...interface{})
 }
 
 var _ IGoftRouter = &GoftGroup{}
 
 type GoftGroup struct {
 	*gin.RouterGroup
+	// 适配器， 类似数据库等
+	adaptors []interface{}
 }
 
 // baseGoftGroup 通过 Goft 返回一个根 GoftGroup
 func baseGoftGroup(r *Goft, group string) *GoftGroup {
 	return &GoftGroup{
 		RouterGroup: r.RouterGroup.Group(group),
+		adaptors:    make([]interface{}, 0),
 	}
 }
 
@@ -34,6 +38,7 @@ func baseGoftGroup(r *Goft, group string) *GoftGroup {
 func newGoftGroup(base *GoftGroup, group string) *GoftGroup {
 	return &GoftGroup{
 		RouterGroup: base.Group(group),
+		adaptors:    base.adaptors,
 	}
 }
 
@@ -117,4 +122,8 @@ func (gg *GoftGroup) Bind(class ClassController) IGoftRoutes {
 	gg.RouterGroup.Handle(m, p, handlerFunc)
 
 	return gg
+}
+
+func (gg *GoftGroup) WithAdaptors(adaptors ...interface{}) {
+	gg.adaptors = append(gg.adaptors, adaptors...)
 }
