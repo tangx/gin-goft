@@ -7,6 +7,18 @@ import (
 	"github.com/tangx/ginbinder"
 )
 
+type IGoftRouter interface {
+	IGoftRoutes
+
+	Mount(string, ...ClassController) *GoftGroup
+}
+type IGoftRoutes interface {
+	Bind(ClassController) IGoftRoutes
+	Attach(...Fairing) IGoftRoutes
+}
+
+var _ IGoftRouter = &GoftGroup{}
+
 type GoftGroup struct {
 	*gin.RouterGroup
 }
@@ -30,18 +42,18 @@ func (gg *GoftGroup) Mount(group string, classes ...ClassController) *GoftGroup 
 	grp := newGoftGroup(gg, group)
 
 	for _, class := range classes {
-		grp.Handle(class)
+		grp.Bind(class)
 	}
 
 	return grp
 }
 
 // Attach 绑定/注册 中间件
-func (gg *GoftGroup) Attach(fairs ...Fairing) {
-	gg.attach(fairs...)
+func (gg *GoftGroup) Attach(fairs ...Fairing) IGoftRoutes {
+	return gg.attach(fairs...)
 }
 
-func (gg *GoftGroup) attach(fairs ...Fairing) {
+func (gg *GoftGroup) attach(fairs ...Fairing) IGoftRoutes {
 	for _, fair := range fairs {
 		fair := fair
 
@@ -70,10 +82,12 @@ func (gg *GoftGroup) attach(fairs ...Fairing) {
 		// 使用 中间件
 		gg.Use(handler)
 	}
+
+	return gg
 }
 
-// Handle 重载 GoftGroup 的 Handle 方法
-func (gg *GoftGroup) Handle(class ClassController) {
+// Bind 重载 GoftGroup 的 Bind 方法
+func (gg *GoftGroup) Bind(class ClassController) IGoftRoutes {
 
 	m := class.Method()
 	p := class.Path()
@@ -101,4 +115,6 @@ func (gg *GoftGroup) Handle(class ClassController) {
 
 	// 调用 gin RouterGroup 的 Handle 方法注册路由
 	gg.RouterGroup.Handle(m, p, handlerFunc)
+
+	return gg
 }

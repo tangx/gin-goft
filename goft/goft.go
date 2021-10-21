@@ -4,6 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var _ IGoftRouter = &Goft{}
+
 type Goft struct {
 	*gin.Engine
 	rootGrp *GoftGroup
@@ -35,8 +37,8 @@ func (goft *Goft) initial() {
 
 // Launch 启动 gin-goft server。
 // 这里由于重载问题， 不能将启动方法命名为 Run
-func (goft *Goft) Launch() error {
-	return goft.Run(":8089")
+func (goft *Goft) Launch(addrs ...string) error {
+	return goft.Run(addrs...)
 }
 
 // Mount 挂载控制器
@@ -47,13 +49,10 @@ func (goft *Goft) Mount(group string, classes ...ClassController) *GoftGroup {
 	return goft.rootGrp.Mount(group, classes...)
 }
 
-// BasePath 设置 Goft 的根路由
-func (goft *Goft) BasePath(group string) *Goft {
-	goft.rootGrp = baseGoftGroup(goft, group)
-
-	return goft
+func (goft *Goft) Attach(fairs ...Fairing) IGoftRoutes {
+	return goft.rootGrp.Attach(fairs...)
 }
 
-func (goft *Goft) Attach(fairs ...Fairing) {
-	goft.rootGrp.Attach(fairs...)
+func (goft *Goft) Bind(class ClassController) IGoftRoutes {
+	return goft.rootGrp.Bind(class)
 }

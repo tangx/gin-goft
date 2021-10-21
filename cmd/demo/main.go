@@ -11,9 +11,6 @@ func main() {
 	g := goft.Default()
 	// g.Attach(&middlewares.User{})
 
-	// 2. 设置 base Path
-	g.BasePath("/demo")
-
 	// 2. 注册多个路由组
 	g.Mount("/v1", classes.NewIndex())
 
