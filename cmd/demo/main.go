@@ -11,15 +11,18 @@ func main() {
 	g := goft.Default()
 	// g.Attach(&middlewares.User{})
 
+	demo := g.Mount("/demo")
+
 	// 2. 注册多个路由组
-	g.Mount("/v1", classes.NewIndex())
+	demo.Mount("/v1",
+		classes.NewIndex(),
+		&classes.GetUserByID{},
+	)
 
 	{
-		v2Router := g.Mount("/v2")
+		v2 := demo.Mount("/v2")
 		// 子路由注册中间件
-		// v2Router.Attach(middlewares.NewUser())
-
-		v2Router.Mount("/v3", classes.NewIndex())
+		v2.Mount("/v3", classes.NewIndex())
 
 	}
 

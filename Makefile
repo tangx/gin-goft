@@ -4,3 +4,7 @@ up:
 tidy:
 	go mod tidy
 
+compose.up:
+	docker-compose up -d
+compose.down:
+	docker-compose down

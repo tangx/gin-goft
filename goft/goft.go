@@ -9,6 +9,8 @@ var _ IGoftRouter = &Goft{}
 type Goft struct {
 	*gin.Engine
 	rootGrp *GoftGroup
+
+	dba interface{}
 }
 
 // Default 创建一个默认的 Engine
@@ -55,4 +57,10 @@ func (goft *Goft) Attach(fairs ...Fairing) IGoftRoutes {
 
 func (goft *Goft) Bind(class ClassController) IGoftRoutes {
 	return goft.rootGrp.Bind(class)
+}
+
+// DB 为 goft 设置一个 DatabaseAdaptor
+func (goft *Goft) DB(dba interface{}) *Goft {
+	goft.dba = dba
+	return goft
 }
