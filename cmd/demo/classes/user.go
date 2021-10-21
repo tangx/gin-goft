@@ -5,12 +5,15 @@ import (
 	"github.com/tangx-labs/gin-goft/cmd/demo/adaptors"
 	"github.com/tangx-labs/gin-goft/cmd/demo/models"
 	"github.com/tangx-labs/gin-goft/httpx"
+	"github.com/tangx/ginbinder"
 )
 
 type GetUserByID struct {
 	httpx.MethodGet
-	UserID string                `uri:"id"`
-	DBA    *adaptors.GormAdaptor `ginbinder:"-"`
+	DBA *adaptors.GormAdaptor `ginbinder:"-"`
+}
+type GetUserByIDParams struct {
+	UserID string `uri:"id"`
 }
 
 func (user *GetUserByID) Path() string {
@@ -20,7 +23,11 @@ func (user *GetUserByID) Path() string {
 func (user *GetUserByID) Handler(c *gin.Context) (interface{}, error) {
 	um := &models.User{}
 
-	user.UserID = c.Param("id")
-	user.DBA.DB.Where("user_id=?", user.UserID).First(um)
+	params := &GetUserByIDParams{}
+	if err := ginbinder.ShouldBindRequest(c, params); err != nil {
+		return nil, err
+	}
+
+	user.DBA.DB.Where("user_id=?", params.UserID).First(um)
 	return um, nil
 }

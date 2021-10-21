@@ -7,4 +7,4 @@ GET http://127.0.0.1:8089/demo/v2/v3/index?name=zhangsan
 GET http://127.0.0.1:8089/demo/v1/index?name=wangwu
 
 ### GET user by id
-GET http://127.0.0.1:8089/demo/v1/users/1
+GET http://127.0.0.1:8089/demo/v1/users/2

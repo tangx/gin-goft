@@ -96,18 +96,22 @@ func (gg *GoftGroup) Bind(class ClassController) IGoftRoutes {
 
 	gg.setAdaptor(class)
 
+	gg.bind(class)
+
+	return gg
+}
+
+// bind 将 class 控制器绑定到 GoftGroup 路由中
+// 如果 class 中的字段有太复杂的字段(例如 *gorm.DB), 使用 ginbinder 会引发 panic， 引起修改为 class.Handler(*gin.Context) 在业务中自己处理。
+func (gg *GoftGroup) bind(class ClassController) {
+
 	m := class.Method()
 	p := class.Path()
 	handler := class.Handler
 
 	// 将业务逻辑封装成为 gin.HandlerFunc
 	handlerFunc := func(c *gin.Context) {
-		// 绑定参数到对象中
-		// err := ginbinder.ShouldBindRequest(c, class)
-		// if err != nil {
-		// 	c.JSON(http.StatusBadRequest, err.Error())
-		// 	return
-		// }
+		/* 绑定参数到对象中 */
 
 		// 执行业务逻辑，获取返回值
 		v, err := handler(c)
@@ -123,13 +127,13 @@ func (gg *GoftGroup) Bind(class ClassController) IGoftRoutes {
 	// 调用 gin RouterGroup 的 Handle 方法注册路由
 	gg.RouterGroup.Handle(m, p, handlerFunc)
 
-	return gg
 }
 
 func (gg *GoftGroup) WithAdaptors(adaptors ...interface{}) {
 	gg.adaptors = append(gg.adaptors, adaptors...)
 }
 
+// setAdaptor 为 class 注入匹配的 adaptor
 func (gg *GoftGroup) setAdaptor(class ClassController) {
 	rv := reflect.ValueOf(class)
 	rv = reflect.Indirect(rv)
@@ -150,6 +154,7 @@ func (gg *GoftGroup) setAdaptor(class ClassController) {
 	}
 }
 
+// getAdaptor 从 GoftGroup 中的 adaptors 中返回匹配类型的 Adaptor
 func (gg *GoftGroup) getAdaptor(t reflect.Type) interface{} {
 	for _, adaptor := range gg.adaptors {
 		if t == reflect.TypeOf(adaptor) {
