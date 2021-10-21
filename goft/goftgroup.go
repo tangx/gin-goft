@@ -26,7 +26,7 @@ type GoftGroup struct {
 // baseGoftGroup 通过 Goft 返回一个根 GoftGroup
 func baseGoftGroup(r *Goft, group string) *GoftGroup {
 	return &GoftGroup{
-		RouterGroup: r.Group(group),
+		RouterGroup: r.RouterGroup.Group(group),
 	}
 }
 

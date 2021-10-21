@@ -24,5 +24,5 @@ func main() {
 	}
 
 	// 3. 启动 goft server
-	g.Launch()
+	g.Launch(":8089")
 }
