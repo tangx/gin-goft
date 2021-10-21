@@ -2,9 +2,9 @@ package goft
 
 import (
 	"net/http"
+	"reflect"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tangx/ginbinder"
 )
 
 type IGoftRouter interface {
@@ -94,6 +94,8 @@ func (gg *GoftGroup) attach(fairs ...Fairing) IGoftRoutes {
 // Bind 重载 GoftGroup 的 Bind 方法
 func (gg *GoftGroup) Bind(class ClassController) IGoftRoutes {
 
+	gg.setAdaptor(class)
+
 	m := class.Method()
 	p := class.Path()
 	handler := class.Handler
@@ -101,14 +103,14 @@ func (gg *GoftGroup) Bind(class ClassController) IGoftRoutes {
 	// 将业务逻辑封装成为 gin.HandlerFunc
 	handlerFunc := func(c *gin.Context) {
 		// 绑定参数到对象中
-		err := ginbinder.ShouldBindRequest(c, class)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, err.Error())
-			return
-		}
+		// err := ginbinder.ShouldBindRequest(c, class)
+		// if err != nil {
+		// 	c.JSON(http.StatusBadRequest, err.Error())
+		// 	return
+		// }
 
 		// 执行业务逻辑，获取返回值
-		v, err := handler()
+		v, err := handler(c)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, err.Error())
 			return
@@ -126,4 +128,34 @@ func (gg *GoftGroup) Bind(class ClassController) IGoftRoutes {
 
 func (gg *GoftGroup) WithAdaptors(adaptors ...interface{}) {
 	gg.adaptors = append(gg.adaptors, adaptors...)
+}
+
+func (gg *GoftGroup) setAdaptor(class ClassController) {
+	rv := reflect.ValueOf(class)
+	rv = reflect.Indirect(rv)
+
+	for i := 0; i < rv.NumField(); i++ {
+		// 循环遍历所有字段
+		fv := rv.Field(i)
+		// 如果 fv 已有值， 或者 fv 不是指针，则跳过
+		if fv.Kind() != reflect.Ptr || !fv.IsNil() {
+			continue
+		}
+
+		ft := fv.Type()
+		if adp := gg.getAdaptor(ft); adp != nil {
+			fv.Set(reflect.New(fv.Type().Elem()))
+			fv.Elem().Set(reflect.ValueOf(adp).Elem())
+		}
+	}
+}
+
+func (gg *GoftGroup) getAdaptor(t reflect.Type) interface{} {
+	for _, adaptor := range gg.adaptors {
+		if t == reflect.TypeOf(adaptor) {
+			return adaptor
+		}
+	}
+
+	return nil
 }
