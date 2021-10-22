@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 type IGoftRouter interface {
@@ -131,8 +132,9 @@ func (gg *GoftGroup) WithAdaptors(adaptors ...interface{}) {
 }
 
 func (gg *GoftGroup) setAdaptor(class ClassController) {
-	rv := reflect.ValueOf(class)
-	rv = reflect.Indirect(rv)
+	logrus.Debugln("in setAdaptor")
+	rv := reflect.ValueOf(class).Elem()
+	// rv = reflect.Indirect(rv)
 
 	rt := reflect.TypeOf(class).Elem()
 
@@ -144,17 +146,20 @@ func (gg *GoftGroup) setAdaptor(class ClassController) {
 			continue
 		}
 
-		ft := fv.Type()
-		if adp := gg.getAdaptor(ft); adp != nil {
-			// 注入
+		fvType := fv.Type()
+
+		// 注解
+		if IsAnnotation(fvType) {
+			tag := rt.Field(i).Tag
+			fv.Set(reflect.New(fv.Type().Elem()))
+			fv.Interface().(IAnnotation).SetTag(tag)
+			continue
+		}
+
+		// 注入
+		if adp := gg.getAdaptor(fvType); adp != nil {
 			fv.Set(reflect.New(fv.Type().Elem()))
 			fv.Elem().Set(reflect.ValueOf(adp).Elem())
-
-			// 注解
-			if IsAnnotation(ft) {
-				tag := rt.Field(i).Tag
-				adp.(Annotation).SetTag(tag)
-			}
 		}
 	}
 }

@@ -72,3 +72,11 @@ func (goft *Goft) DB(dba interface{}) *Goft {
 func (goft *Goft) WithAdaptors(adaptors ...interface{}) {
 	goft.rootGrp.WithAdaptors(adaptors...)
 }
+
+func (goft *Goft) WithAnnotations(annos ...IAnnotation) *Goft {
+	for _, anno := range annos {
+		IAnnotationList = append(IAnnotationList, anno)
+	}
+
+	return goft
+}

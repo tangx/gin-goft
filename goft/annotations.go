@@ -1,15 +1,18 @@
 package goft
 
-import "reflect"
+import (
+	"reflect"
+)
 
-type Annotation interface {
+type IAnnotation interface {
 	SetTag(reflect.StructTag)
+	String() string
 }
 
-var AnnotationList []Annotation
+var IAnnotationList []IAnnotation
 
 func IsAnnotation(t reflect.Type) bool {
-	for _, anno := range AnnotationList {
+	for _, anno := range IAnnotationList {
 		if reflect.TypeOf(anno) == t {
 			return true
 		}
@@ -19,18 +22,5 @@ func IsAnnotation(t reflect.Type) bool {
 }
 
 func init() {
-	AnnotationList = make([]Annotation, 0)
-	AnnotationList = append(AnnotationList, new(Value))
-}
-
-type Value struct {
-	tag reflect.StructTag
-}
-
-func (value *Value) SetTag(tag reflect.StructTag) {
-	value.tag = tag
-}
-
-func (value *Value) String() string {
-	return "32"
+	IAnnotationList = make([]IAnnotation, 0)
 }

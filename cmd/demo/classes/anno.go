@@ -4,14 +4,18 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tangx-labs/gin-goft/goft"
+	"github.com/tangx-labs/gin-goft/cmd/demo/annotations"
 	"github.com/tangx-labs/gin-goft/httpx"
 )
 
 type AnnoDemo struct {
 	httpx.MethodGet
 
-	Age *goft.Value `prefix:"user.age"`
+	Age *annotations.Value `prefix:"user.age"`
+}
+
+func NewAnnoDemo() *AnnoDemo {
+	return &AnnoDemo{}
 }
 
 func (demo *AnnoDemo) Path() string {
