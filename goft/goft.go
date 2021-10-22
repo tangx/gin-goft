@@ -1,6 +1,8 @@
 package goft
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -39,8 +41,10 @@ func (goft *Goft) initial() {
 
 // Launch 启动 gin-goft server。
 // 这里由于重载问题， 不能将启动方法命名为 Run
-func (goft *Goft) Launch(addrs ...string) error {
-	return goft.Run(addrs...)
+func (goft *Goft) Launch() error {
+	addr := fmt.Sprintf("%s:%d", config.Server.Host, config.Server.Port)
+	return goft.Run(addr)
+	// return goft.Run(addrs...)
 }
 
 // Mount 挂载控制器

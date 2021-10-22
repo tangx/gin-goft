@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/tangx-labs/gin-goft/cmd/demo/adaptors"
 	"github.com/tangx-labs/gin-goft/cmd/demo/classes"
 	"github.com/tangx-labs/gin-goft/goft"
 )
@@ -12,7 +11,7 @@ func main() {
 	g := goft.Default()
 	// g.Attach(&middlewares.User{})
 	g.WithAdaptors(
-		adaptors.NewGormAdaptor(),
+	// adaptors.NewGormAdaptor(),
 	)
 
 	demo := g.Mount("/demo")
@@ -31,5 +30,5 @@ func main() {
 	}
 
 	// 3. 启动 goft server
-	g.Launch(":8089")
+	g.Launch()
 }
