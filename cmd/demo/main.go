@@ -20,6 +20,7 @@ func main() {
 	demo.Mount("/v1",
 		classes.NewIndex(),
 		&classes.GetUserByID{},
+		&classes.AnnoDemo{},
 	)
 
 	{

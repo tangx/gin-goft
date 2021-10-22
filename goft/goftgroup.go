@@ -134,6 +134,8 @@ func (gg *GoftGroup) setAdaptor(class ClassController) {
 	rv := reflect.ValueOf(class)
 	rv = reflect.Indirect(rv)
 
+	rt := reflect.TypeOf(class).Elem()
+
 	for i := 0; i < rv.NumField(); i++ {
 		// 循环遍历所有字段
 		fv := rv.Field(i)
@@ -144,8 +146,15 @@ func (gg *GoftGroup) setAdaptor(class ClassController) {
 
 		ft := fv.Type()
 		if adp := gg.getAdaptor(ft); adp != nil {
+			// 注入
 			fv.Set(reflect.New(fv.Type().Elem()))
 			fv.Elem().Set(reflect.ValueOf(adp).Elem())
+
+			// 注解
+			if IsAnnotation(ft) {
+				tag := rt.Field(i).Tag
+				adp.(Annotation).SetTag(tag)
+			}
 		}
 	}
 }
