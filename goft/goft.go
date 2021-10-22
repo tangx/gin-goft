@@ -2,6 +2,7 @@ package goft
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,6 +12,8 @@ var _ IGoftRouter = &Goft{}
 type Goft struct {
 	*gin.Engine
 	rootGrp *GoftGroup
+
+	onceWithAdaptors sync.Once
 }
 
 // Default 创建一个默认的 Engine
@@ -62,7 +65,11 @@ func (goft *Goft) Bind(class ClassController) IGoftRoutes {
 
 // WithAdaptors 注入适配器， 比如 *gorm.DB, *goredis.Redis
 func (goft *Goft) WithAdaptors(adaptors ...interface{}) {
-	goft.rootGrp.WithAdaptors(adaptors...)
+	goft.onceWithAdaptors.Do(
+		func() {
+			goft.rootGrp.adaptors = append(goft.rootGrp.adaptors, adaptors...)
+		},
+	)
 }
 
 func (goft *Goft) WithAnnotations(annos ...IAnnotation) *Goft {

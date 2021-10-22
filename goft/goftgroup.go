@@ -16,7 +16,6 @@ type IGoftRouter interface {
 type IGoftRoutes interface {
 	Bind(ClassController) IGoftRoutes
 	Attach(...Fairing) IGoftRoutes
-	WithAdaptors(adaptors ...interface{})
 }
 
 var _ IGoftRouter = &GoftGroup{}
@@ -130,10 +129,6 @@ func (gg *GoftGroup) bind(class ClassController) {
 
 }
 
-func (gg *GoftGroup) WithAdaptors(adaptors ...interface{}) {
-	gg.adaptors = append(gg.adaptors, adaptors...)
-}
-
 // setAdaptor 为 class 注入匹配的 adaptor
 func (gg *GoftGroup) setAdaptor(class ClassController) {
 	logrus.Debugln("in setAdaptor")
@@ -162,8 +157,11 @@ func (gg *GoftGroup) setAdaptor(class ClassController) {
 
 		// 注入
 		if adp := gg.getAdaptor(fvType); adp != nil {
-			fv.Set(reflect.New(fv.Type().Elem()))
-			fv.Elem().Set(reflect.ValueOf(adp).Elem())
+			// 此时字段是 nil ， 因此对字段 fv 先进行初始化
+			// fv.Set(reflect.New(fv.Type().Elem()))
+			// 反射赋值
+			// fv.Elem().Set(reflect.ValueOf(adp).Elem())
+			fv.Set(reflect.ValueOf(adp))
 		}
 	}
 }
