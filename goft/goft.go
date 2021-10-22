@@ -1,6 +1,8 @@
 package goft
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -36,9 +38,10 @@ func (goft *Goft) initial() {
 }
 
 // Launch 启动 gin-goft server。
-// 这里由于重载问题， 不能将启动方法命名为 Run
-func (goft *Goft) Launch(addrs ...string) error {
-	return goft.Run(addrs...)
+func (goft *Goft) Launch() error {
+	addr := fmt.Sprintf("%s:%d", config.Server.Host, config.Server.Port)
+	return goft.Run(addr)
+	// return goft.Run(addrs...)
 }
 
 // Mount 挂载控制器
@@ -60,4 +63,12 @@ func (goft *Goft) Bind(class ClassController) IGoftRoutes {
 // WithAdaptors 注入适配器， 比如 *gorm.DB, *goredis.Redis
 func (goft *Goft) WithAdaptors(adaptors ...interface{}) {
 	goft.rootGrp.WithAdaptors(adaptors...)
+}
+
+func (goft *Goft) WithAnnotations(annos ...IAnnotation) *Goft {
+	for _, anno := range annos {
+		IAnnotationList = append(IAnnotationList, anno)
+	}
+
+	return goft
 }

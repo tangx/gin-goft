@@ -1,10 +1,8 @@
 package middlewares
 
 import (
-	"fmt"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 type User struct {
@@ -21,13 +19,10 @@ func NewUser() *User {
 func (user User) OnRequest(c *gin.Context) (err error) {
 
 	user.Name = c.Query("name")
-	if user.Name != "zhangsan" {
-		err = fmt.Errorf("非法用户: %s", user.Name)
 
-		c.AbortWithStatusJSON(http.StatusBadRequest, map[string]string{
-			"error": err.Error(),
-		})
-		return
+	_wanted := "zhangsan"
+	if user.Name != "zhangsan" {
+		logrus.Warnf("user is %s, wanted %s", user.Name, _wanted)
 	}
 
 	return
